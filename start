@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#
+#   sh start.sh
+#
+
+export DB_NAME=/var/lib/drop/db/node_collector.db
+export FLOWS_DIR=/var/lib/drop/flows
+export DROP_HOME=/opt/drop-core
+export DROP_REPO="drop-master"
+export PORT=8082
+export API_PORT=8081
+
+exec /opt/drop-pyenv/bin/uwsgi --ini uwsgi.ini 

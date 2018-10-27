@@ -1,0 +1,20 @@
+
+[Unit]
+Description=DROP Gateway API
+
+[Service]
+Type=simple
+
+User=root
+Group=root
+
+WorkingDirectory=/opt/drop-gateway-api
+ExecStart=/opt/drop-gateway-api/start
+ExecStop=
+KillMode=process
+KillSignal=SIGKILL
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
