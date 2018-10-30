@@ -92,5 +92,7 @@ listen drop {{vip}}:8083
         # server node1 SERV1:8081 check port 8081 maxconn 100000
         # server node2 SERV2:8081 check port 8081 maxconn 100000
 
-        {% for n in servers %}server {{n.id}} {{n.name}}:8081 check port 8081 maxconn 100000 \n{% endfor %}
+        {% for n in servers %}
+        server {{n.id}} {{n.name}}:8081 check port 8081 maxconn 100000
+        {% endfor %}
 
