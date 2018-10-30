@@ -94,6 +94,11 @@ def cluster_create0():
     c.commit()
     c.close()
 
+    if os.environ.get("IS_HAPROXY") == "1":
+        servs = [{"id": x.split("@")[0], "name": x.split("@")[1]}
+                 for x in node_ids]
+        make_ha_config(vip, servs)
+
     return "ok", 200
 
 
@@ -142,6 +147,11 @@ def delete_cluster0(name):
     c.commit()
 
     c.close()
+
+    if os.environ.get("IS_HAPROXY") == "1":
+        servs = [{"id": x.split("@")[0], "name": x.split("@")[1]}
+                 for x in ["localhost@127.0.0.1"]]
+        make_ha_config("127.0.0.1", servs)
 
     return "ok", 200
 
