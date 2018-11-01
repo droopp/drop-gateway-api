@@ -1,7 +1,6 @@
 
 from drop_core import *
 
-
 @app.route("/api/v1/<name>/service",  methods=['GET'])
 @jwt_required()
 def get_service_list(name):
@@ -198,7 +197,9 @@ def do_service_stop(name, sid):
 
 @app.route("/api/v1/service0/<name>",  methods=['DELETE'])
 @jwt_required()
-def do_service_stop0(name):
+def _do_service_stop0(name):
 
-    res = run_shell("systemctl stop {} && echo \"ok\"".format(name))
+    res = do_service_stop0(name)
+    # res = run_shell("systemctl stop {} && echo \"ok\"".format(name))
     return res, 200
+

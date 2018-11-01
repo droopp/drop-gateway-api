@@ -13,3 +13,7 @@ def make_ha_config(vip, servers):
     out = t.render(vip=vip, servers=servers)
     with open("/etc/haproxy/haproxy.cfg", "w+") as f:
         f.write(out)
+
+def do_service_stop0(name):
+    res = run_shell("systemctl stop {} && echo \"ok\"".format(name))
+    return res

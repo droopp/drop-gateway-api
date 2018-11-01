@@ -1,6 +1,4 @@
-
 from drop_core import *
-
 
 @app.route("/api/v1/cluster",  methods=['GET'])
 @jwt_required()
@@ -129,6 +127,28 @@ def delete_cluster(name):
     return json.dumps(res, sort_keys=True, indent=4), 200
 
 
+def stop_all_services(r, name):
+
+    r.execute("""select detail
+                  from node_world s where s.group0 = '{}'
+                  LIMIT 1
+              """.format(name))
+
+    for i in r.fetchall():
+
+        _serv = None
+
+        try:
+            _serv = json.loads(i[0]).get("service")
+        except:
+            pass
+
+        if _serv is not None:
+            for k in _serv.iterkeys():
+                do_service_stop0(k)
+
+
+
 @app.route("/api/v1/cluster0/<name>",  methods=['DELETE'])
 @jwt_required()
 def delete_cluster0(name):
@@ -138,6 +158,12 @@ def delete_cluster0(name):
     date = time.time()
     data = json.dumps({"vip": "127.0.0.1",
                        "timestamp": date})
+
+    #  stop all services
+
+    stop_all_services(r, name)
+
+    #  clear service and vip data
 
     r.execute("""update node_world
                  set group0 = 'None',
@@ -245,6 +271,12 @@ def delete_node_cluster(name, nid):
     data = json.dumps({"vip": "127.0.0.1",
                        "timestamp": date})
 
+    #  stop all services
+
+    stop_all_services(r, name)
+
+    #  clear service and vip data
+
     r.execute("""update node_world
                  set group0 = 'None',
                      detail = '{}',
@@ -253,8 +285,13 @@ def delete_node_cluster(name, nid):
                   and  node = '{}'
               """.format(data, name, nid))
     c.commit()
-
     c.close()
+
+    if os.environ.get("IS_HAPROXY") == "1":
+        servs = [{"id": x.split("@")[0], "name": x.split("@")[1]}
+                 for x in ["localhost@127.0.0.1"]]
+        make_ha_config("127.0.0.1", servs)
+
 
     return "ok", 200
 
