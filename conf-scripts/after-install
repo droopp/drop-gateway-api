@@ -1,5 +1,8 @@
 #!/bin/sh
 
+useradd drop-core
+chown -R drop-core:drop-core /opt/drop-gateway-api
+
 cp /opt/drop-gateway-api/conf/drop-gateway-api.service /etc/systemd/system/ && systemctl daemon-reload
 systemctl enable drop-gateway-api
 
