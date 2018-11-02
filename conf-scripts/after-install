@@ -7,4 +7,4 @@ cp /opt/drop-gateway-api/conf/drop-gateway-api.service /etc/systemd/system/ && s
 systemctl enable drop-gateway-api
 
 ## start service
-systemctl restart drop-gateway-api
+# systemctl restart drop-gateway-api
