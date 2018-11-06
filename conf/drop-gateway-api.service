@@ -5,8 +5,8 @@ Description=DROP Gateway API
 [Service]
 Type=simple
 
-User=root
-Group=root
+User=drop-core
+Group=drop-core
 
 WorkingDirectory=/opt/drop-gateway-api
 ExecStart=/opt/drop-gateway-api/start
