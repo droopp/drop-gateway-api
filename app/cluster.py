@@ -1,5 +1,6 @@
 from drop_core import *
 
+
 @app.route("/api/v1/cluster",  methods=['GET'])
 @jwt_required()
 def cluster_list():
@@ -149,7 +150,6 @@ def stop_all_services(r, name):
                 do_service_stop0(k)
 
 
-
 @app.route("/api/v1/cluster0/<name>",  methods=['DELETE'])
 @jwt_required()
 def delete_cluster0(name):
@@ -293,7 +293,6 @@ def delete_node_cluster(name, nid):
                  for x in ["localhost@127.0.0.1"]]
         make_ha_config("127.0.0.1", servs)
 
-
     return "ok", 200
 
 
@@ -325,7 +324,7 @@ def get_cluster_nodes(name):
                     "node": i[1],
                     "ip": i[1].split("@")[1],
                     "hostname": i[2],
-                    "status": (lambda x: "up" and x == 1 or "down")(i[3]),
+                    "status": (lambda x: x == 1 and "UP" or "DOWN")(i[3]),
                     "created": i[4],
                     "cluster": i[5],
                     "serv_conf": _serv
