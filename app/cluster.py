@@ -11,6 +11,7 @@ def cluster_list():
                   from node_world s
                    where s.group0 != 'None'
                      and s.detail like '%is_vip\": 1%'
+                     and s.active = 1
                 group by s.group0
               """)
 
@@ -324,7 +325,7 @@ def get_cluster_nodes(name):
                     "node": i[1],
                     "ip": i[1].split("@")[1],
                     "hostname": i[2],
-                    "status": i[3],
+                    "status": (lambda x: "up" and x == 1 or "down")(i[3]),
                     "created": i[4],
                     "cluster": i[5],
                     "serv_conf": _serv
