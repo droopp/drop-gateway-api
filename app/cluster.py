@@ -242,22 +242,35 @@ def cluster_node_create(name, nid):
     c = s3.connect(DB_NAME)
     r = c.cursor()
 
-    r.execute("""select detail from  node_world
+    r.execute("""select detail, node from  node_world
                  where group0 = '{}'
-                 LIMIT 1
+                 -- LIMIT 1
               """.format(name))
 
+    _det = ""
+    servs = [nid]
+    _vip = ""
+
     for i in r:
-        r.execute("""update node_world
-                    set group0 = '""" + name + """',
-                        detail = '""" + i[0] + """',
-                        date = CURRENT_TIMESTAMP
-                    where
-                        node = '{}'
-                """.format(nid))
-        c.commit()
+        servs.append(i[1])
+        _det = i[0]
+        _vip = json.loads(_det)["vip"]
+
+    r.execute("""update node_world
+                set group0 = '""" + name + """',
+                    detail = '""" + _det + """',
+                    date = CURRENT_TIMESTAMP
+                where
+                    node = '{}'
+            """.format(nid))
+    c.commit()
 
     c.close()
+
+    if os.environ.get("IS_HAPROXY") == "1":
+        servs = [{"id": x.split("@")[0], "name": x.split("@")[1]}
+                 for x in node_ids]
+        make_ha_config(_vip, servs)
 
     return "ok", 200
 
