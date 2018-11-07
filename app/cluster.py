@@ -8,7 +8,7 @@ def cluster_list():
     c = s3.connect(DB_NAME)
     r = c.cursor()
 
-    r.execute("""select s.group0, s.uuid, s.detail
+    r.execute("""select s.group0, s.uuid, s.detail, s.node
                   from node_world s
                    where s.group0 != 'None'
                      and s.detail like '%is_vip\": 1%'
@@ -20,6 +20,7 @@ def cluster_list():
     for i in r.fetchall():
         res.append({"cluster": i[0],
                     "vip_host": {"uuid": i[1],
+                                 "name": i[3],
                                  "vip": json.loads(i[2])["vip"]
                                  }
                     })
@@ -248,11 +249,11 @@ def cluster_node_create(name, nid):
               """.format(name))
 
     _det = ""
-    servs = [nid]
+    node_ids = [nid]
     _vip = ""
 
     for i in r:
-        servs.append(i[1])
+        node_ids.append(i[1])
         _det = i[0]
         _vip = json.loads(_det)["vip"]
 
