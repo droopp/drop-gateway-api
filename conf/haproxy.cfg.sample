@@ -69,8 +69,8 @@ listen stats *:1936
         stats uri /haproxy?stats
         stats auth admin:admin123
 
-listen ui *:8084
-        server node0 *:8082
+# listen ui *:8084
+#        server node0 *:8082
 
 
 listen drop {{vip}}:8083
