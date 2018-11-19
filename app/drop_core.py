@@ -19,3 +19,4 @@ from cluster import *
 from service import *
 from plugin import *
 from stats import *
+from flows import *
