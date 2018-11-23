@@ -1,4 +1,5 @@
 
+
 from drop_core import *
 
 
@@ -25,6 +26,43 @@ def get_nodes_stat(name):
             res[n["node"]] = json.loads(r.text)
         except Exception as e:
             res[n["node"]] = str(e)
+
+    return json.dumps(res, sort_keys=True, indent=4), 200
+
+
+@app.route("/api/v1/stats/logs/<node>/<name>",  methods=['POST'])
+def get_nodes_log(node, name):
+
+    res = ""
+
+    _url = "http://{}:{}/api/v1/logs/{}".format(node, os.environ["PORT"], name)
+
+    try:
+
+        r = requests.get(_url,
+                         headers={"Content-type": "application/json"
+                                  })
+
+        res = r.text
+    except Exception as e:
+        res = str(e)
+
+    return res, 200
+
+
+@app.route("/api/v1/logs/<name>",  methods=['GET'])
+def get_nodes_log0(name):
+
+    res = {}
+
+    try:
+
+        with open("{}/{}.log".format(os.environ["LOGS_DIR"], name)) as f:
+            content = f.read().splitlines()
+            res["text"] = "<br>".join(content[len(content)-30:])
+
+    except Exception as e:
+        res["text"] = str(e)
 
     return json.dumps(res, sort_keys=True, indent=4), 200
 
