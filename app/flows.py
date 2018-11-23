@@ -2,7 +2,7 @@
 from drop_core import *
 
 
-@app.route("/api/v1.0/stat/flows",  methods=['POST'])
+@app.route("/api/v1/stat/flows",  methods=['POST'])
 @jwt_required()
 def flows2():
     l = glob.glob(FLOWS_DIR + "/*.json")
