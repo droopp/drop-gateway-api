@@ -6,6 +6,8 @@ from jinja2 import Template
 def run_shell(cmd):
     return sp.check_output("sudo {};exit 0".format(cmd), shell=True, stderr=sp.STDOUT).strip()
 
+def run_shell0(cmd):
+    return sp.check_output("{};exit 0".format(cmd), shell=True, stderr=sp.STDOUT).strip()
 
 def make_ha_config(vip, servers):
     d = open("./conf/haproxy.cfg.sample").read()

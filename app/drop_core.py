@@ -18,5 +18,6 @@ from freenode import *
 from cluster import *
 from service import *
 from plugin import *
+from function import *
 from stats import *
 from flows import *

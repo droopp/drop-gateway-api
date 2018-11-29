@@ -1,6 +1,7 @@
 
 from drop_core import *
 import requests
+import gevent
 
 
 @app.route("/api/v1/repo",  methods=['GET'])
@@ -204,6 +205,23 @@ def do_plugin_call0(name):
     return r.text, r.status_code
 
 
+def _gevent_p_install(par):
+
+    node, _url, _jwt, sid = par
+
+    try:
+
+        r = requests.post(_url + "/api/v1/repo/plugin0/" + sid,
+                          headers={"Content-type": "application/json",
+                                   "Authorization": _jwt
+                                   }
+                          )
+
+        return (node, json.loads(r.text))
+    except Exception as e:
+        return (node, str(e))
+
+
 @app.route("/api/v1/<name>/repo/plugin/<sid>",  methods=['POST'])
 @jwt_required()
 def do_plugin_install(name, sid):
@@ -212,21 +230,30 @@ def do_plugin_install(name, sid):
     _jwt = request.headers.get('Authorization')
     res = {}
 
+    _res = []
+
     for n in nodes:
         if n["cluster"] != name:
             continue
         _url = "http://{}:{}".format(n["ip"], os.environ["PORT"])
 
-        try:
-            r = requests.post(_url + "/api/v1/repo/plugin0/" + sid,
-                              headers={"Content-type": "application/json",
-                                       "Authorization": _jwt
-                                       }
-                              )
+        _res.append(gevent.spawn(_gevent_p_install, (n["node"], _url, _jwt, sid) ))
 
-            res[n["node"]] = json.loads(r.text)
-        except Exception as e:
-            res[n["node"]] = str(e)
+        # try:
+        #     r = requests.post(_url + "/api/v1/repo/plugin0/" + sid,
+        #                       headers={"Content-type": "application/json",
+        #                                "Authorization": _jwt
+        #                                }
+        #                       )
+        #
+        #     res[n["node"]] = json.loads(r.text)
+        # except Exception as e:
+        #     res[n["node"]] = str(e)
+
+    gevent.joinall(_res)
+    for r in _res:
+        _n, _v = r.value
+        res[_n] = _v
 
     return json.dumps(res, sort_keys=True, indent=4), 200
 

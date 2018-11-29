@@ -378,7 +378,15 @@ def get_cluster_version(name):
 @app.route("/api/v1/node/version",  methods=['GET'])
 @jwt_required()
 def get_cluster_version0():
+
+    res = {}
     ver = run_shell("rpm -qa|grep \"drop-\"|sort|sha1sum").split(" ")[0]
-    res = {"sha1sum": ver}
+    res["rpm"] =  ver
+    ver = run_shell0("docker images|sort|sha1sum").split(" ")[0]
+    res["docker"] =  ver
+    ver = run_shell0("cat /var/lib/drop/flows/* | sort|sha1sum").split(" ")[0]
+    res["flows"] =  ver
+    res["all"] = run_shell0("echo " + res["rpm"] + res["docker"] +\
+                             res["flows"] +  " | sort|sha1sum").split(" ")[0]
 
     return json.dumps(res, sort_keys=True, indent=4), 200
