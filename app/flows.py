@@ -51,7 +51,7 @@ def get_flow_list(name):
                                       })
 
             if r.status_code == 200:
-                res[n["node"]] = json.loads(r.text)["name"]
+                res[n["node"]] = [x["name"] for x in json.loads(r.text)]
             else:
                 raise Exception(r.text)
 
