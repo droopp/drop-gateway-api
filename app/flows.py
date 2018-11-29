@@ -169,7 +169,7 @@ def do_flow_call(name, sid):
 
             if r.status_code == 200:
 
-                res[n["node"]] = json.loads(r.text)
+                res[n["node"]] = r.text
                 if _all is None:
                     break
             else:
