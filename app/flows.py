@@ -29,6 +29,38 @@ def flows2():
     return res + '</flows></root>', 200
 
 
+@app.route("/api/v1/<name>/flows",  methods=['GET'])
+@jwt_required()
+def get_flow_list(name):
+
+    nodes = json.loads(get_cluster_nodes(name)[0])
+    _jwt = request.headers.get('Authorization')
+    res = {}
+
+    for n in nodes:
+        if n["cluster"] != name:
+            continue
+
+        _url = "http://{}:{}".format(n["ip"], os.environ["PORT"])
+
+        try:
+
+            r = requests.get(_url + "/api/v1/flows",
+                             headers={"Content-type": "application/json",
+                                      "Authorization": _jwt
+                                      })
+
+            if r.status_code == 200:
+                res[n["node"]] = json.loads(r.text)["name"]
+            else:
+                raise Exception(r.text)
+
+        except Exception as e:
+            res[n["node"]] = str(e)
+
+    return json.dumps(res, sort_keys=True, indent=4), 200
+
+
 @app.route("/api/v1/flows",  methods=['GET'])
 @jwt_required()
 def flows():
@@ -51,7 +83,7 @@ def flows():
                         "entry_ppool": row["entry_ppool"]
                         })
         except Exception as e:
-            res.append({"error":"Bad flow structure: {}".format(e)})
+            res.append({"error": "Bad flow structure: {}".format(e)})
 
     return json.dumps(res, sort_keys=True, indent=4), 200
 
@@ -312,9 +344,9 @@ def do_flow_remove(name, sid):
         try:
 
             r = requests.delete(_url + "/api/v1/flows0/" + sid,
-                              headers={"Content-type": "application/json",
-                                       "Authorization": _jwt,
-                                       })
+                                headers={"Content-type": "application/json",
+                                         "Authorization": _jwt,
+                                         })
 
             res[n["node"]] = r.text
         except Exception as e:
@@ -333,5 +365,3 @@ def do_flow_remove0(name):
         return str(e), 500
 
     return "ok", 200
-
-
