@@ -24,6 +24,8 @@ def get_nodes_stat(name):
                                       })
 
             res[n["node"]] = json.loads(r.text)
+            break
+
         except Exception as e:
             res[n["node"]] = str(e)
 
@@ -131,6 +133,8 @@ def get_ppools_stats(name):
                                       })
 
             res[n["node"]] = json.loads(r.text)
+            break
+
         except Exception as e:
             res[n["node"]] = str(e)
 

@@ -322,6 +322,10 @@ def do_flow_install0(name):
 
     with open(l, "a+") as f:
         row = json.loads(data)
+
+        f.seek(0)
+        f.truncate()
+
         f.write(json.dumps(row, sort_keys=True, indent=4))
 
     return "ok", 200
