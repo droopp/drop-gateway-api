@@ -23,7 +23,7 @@ def get_nodes_stat(name):
                                       "Authorization": _jwt
                                       })
 
-            res[n["node"]] = json.loads(r.text)
+            res = json.loads(r.text)
             break
 
         except Exception as e:
@@ -132,7 +132,7 @@ def get_ppools_stats(name):
                                       "Authorization": _jwt
                                       })
 
-            res[n["node"]] = json.loads(r.text)
+            res = json.loads(r.text)
             break
 
         except Exception as e:

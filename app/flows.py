@@ -316,7 +316,7 @@ def do_flow_install(name, sid):
 @jwt_required()
 def do_flow_install0(name):
 
-    data = request.data
+    data = make_json_flow(request.data)
 
     l = "{}/{}.json".format(FLOWS_DIR, name)
 
