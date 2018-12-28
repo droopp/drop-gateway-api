@@ -316,17 +316,20 @@ def do_flow_install(name, sid):
 @jwt_required()
 def do_flow_install0(name):
 
-    data = make_json_flow(request.data)
+    try:
+        data = make_json_flow(request.data)
 
-    l = "{}/{}.json".format(FLOWS_DIR, name)
+        l = "{}/{}.json".format(FLOWS_DIR, name)
 
-    with open(l, "a+") as f:
-        row = json.loads(data)
+        with open(l, "a+") as f:
+            row = json.loads(data)
 
-        f.seek(0)
-        f.truncate()
+            f.seek(0)
+            f.truncate()
 
-        f.write(json.dumps(row, sort_keys=True, indent=4))
+            f.write(json.dumps(row, sort_keys=True, indent=4))
+    except Exception as e:
+        return str(e), 500
 
     return "ok", 200
 
