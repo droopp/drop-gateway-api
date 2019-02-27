@@ -3,6 +3,7 @@ from drop_core import *
 import requests
 import gevent
 
+
 @app.route("/api/v1/f_repo",  methods=['GET'])
 @jwt_required()
 def get_f_repo_list():
@@ -12,7 +13,7 @@ def get_f_repo_list():
     r = requests.get("http://{}/v2/_catalog".format(os.environ["DROP_DOCKER_REGISTRY"]),
                      headers={"Content-type": "application/json",
                               "Authorization": _jwt
-                   })
+                              })
 
     enabled = json.loads(r.text)["repositories"]
 
@@ -59,10 +60,10 @@ def get_fun_list0():
 
 def _gevent_install(par):
 
-    node, _url, _jwt, sid, ver = par
+    node, _url, _jwt, sid, ver, _space = par
 
     try:
-        r = requests.post(_url + "/api/v1/repo/fun0/{}/{}".format(sid, ver),
+        r = requests.post(_url + "/api/v1/repo/fun0/{}/{}?space={}".format(sid, ver, _space),
                           headers={"Content-type": "application/json",
                                    "Authorization": _jwt
                                    }
@@ -79,6 +80,8 @@ def do_fun_install(name, sid, ver):
 
     nodes = json.loads(get_cluster_nodes(name)[0])
     _jwt = request.headers.get('Authorization')
+    _space = request.args.get("space")
+
     res = {}
 
     _res = []
@@ -88,7 +91,7 @@ def do_fun_install(name, sid, ver):
             continue
         _url = "http://{}:{}".format(n["ip"], os.environ["PORT"])
 
-        _res.append(gevent.spawn(_gevent_install, (n["node"], _url, _jwt, sid, ver) ))
+        _res.append(gevent.spawn(_gevent_install, (n["node"], _url, _jwt, sid, ver, _space)))
 
         # try:
         #     r = requests.post(_url + "/api/v1/repo/fun0/{}/{}".format(sid, ver),
@@ -113,10 +116,15 @@ def do_fun_install(name, sid, ver):
 @jwt_required()
 def do_fun_install0(name, ver):
 
-    res = run_shell0("docker pull {}/{}:{} && echo \"ok\"".format(os.environ["DROP_DOCKER_REGISTRY"], 
-                                                                   name, ver))
-    res = run_shell0("docker tag {0}/{1}:{2} {1}:{2} && echo \"ok\"".format(os.environ["DROP_DOCKER_REGISTRY"], 
-                                                                   name, ver))
+    _space = request.args.get("space")
+
+    if _space is None:
+        _space = os.environ["DROP_DOCKER_REGISTRY"]
+
+    res = run_shell0("docker pull {}/{}:{} && echo \"ok\"".format(_space,
+                                                                  name, ver))
+    res = run_shell0("docker tag {0}/{1}:{2} {1}:{2} && echo \"ok\"".format(_space,
+                                                                            name, ver))
 
     return json.dumps({"status": res.split("\n")[-1]},
                       sort_keys=True, indent=4), 200
@@ -128,6 +136,9 @@ def do_fun_remove(name, sid, ver):
 
     nodes = json.loads(get_cluster_nodes(name)[0])
     _jwt = request.headers.get('Authorization')
+
+    _space = request.args.get("space")
+
     res = {}
 
     for n in nodes:
@@ -136,7 +147,7 @@ def do_fun_remove(name, sid, ver):
         _url = "http://{}:{}".format(n["ip"], os.environ["PORT"])
 
         try:
-            r = requests.delete(_url + "/api/v1/repo/fun0/{}/{}".format(sid, ver),
+            r = requests.delete(_url + "/api/v1/repo/fun0/{}/{}?space={}".format(sid, ver, _space),
                                 headers={"Content-type": "application/json",
                                          "Authorization": _jwt
                                          }
@@ -152,12 +163,13 @@ def do_fun_remove(name, sid, ver):
 @jwt_required()
 def do_fun_remove0(name, ver):
 
-    res = run_shell0("docker rmi {}/{}:{} && echo \"ok\"".format(os.environ["DROP_DOCKER_REGISTRY"], 
+    _space = request.args.get("space")
+    if _space is None:
+        _space = os.environ["DROP_DOCKER_REGISTRY"]
+
+    res = run_shell0("docker rmi {}/{}:{} && echo \"ok\"".format(_space,
                                                                  name, ver))
     res = run_shell0("docker rmi {}:{} && echo \"ok\"".format(name, ver))
- 
+
     return json.dumps({"status": res.split("\n")[-1]},
                       sort_keys=True, indent=4), 200
-
-
-
