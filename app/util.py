@@ -63,6 +63,7 @@ def make_json_flow(yaml):
         data = {"name": v["name"],
                 "image": v["image"],
                 "cmd": v["cmd"],
+                "num": v.get("num", 1),
                 "mem": v.get("memory", 100),
                 "timeout": v.get("timeout", 10000)
                 }
@@ -70,7 +71,7 @@ def make_json_flow(yaml):
         n += 1
         flow += '''
                 {{"num":{},
-                  "cmd":"system::local::start_pool::{name}::1"
+                  "cmd":"system::local::start_pool::{name}::{num}"
                  }},'''.format(n, **data)
 
         tail += '''
