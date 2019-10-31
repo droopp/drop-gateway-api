@@ -9,7 +9,6 @@ export DB_NAME=/var/lib/drop/db/node_collector.db
 export FLOWS_DIR=/var/lib/drop/flows
 export LOGS_DIR=/var/lib/drop/logs
 export DROP_HOME=/opt/drop-core
-export IS_HAPROXY="1"
 export DROP_REPO="drop-master"
 export PORT=8082
 export API_PORT=8081

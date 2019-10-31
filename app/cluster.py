@@ -381,12 +381,18 @@ def get_cluster_version0():
 
     res = {}
     ver = run_shell("rpm -qa|grep \"drop-\"|sort|sha1sum").split(" ")[0]
-    res["rpm"] =  ver
-    ver = run_shell0("docker images|sort|sha1sum").split(" ")[0]
-    res["docker"] =  ver
+    res["rpm"] = ver
     ver = run_shell0("cat /var/lib/drop/flows/* | sort|sha1sum").split(" ")[0]
-    res["flows"] =  ver
-    res["all"] = run_shell0("echo " + res["rpm"] + res["docker"] +\
-                             res["flows"] +  " | sort|sha1sum").split(" ")[0]
+    res["flows"] = ver
+
+    if os.environ.get("IS_DOCKER") == "1":
+
+        ver = run_shell0("docker images|sort|sha1sum").split(" ")[0]
+        res["docker"] = ver
+
+        res["all"] = run_shell0("echo " + res["rpm"] + res["docker"] + res["flows"] + " | sort|sha1sum").split(" ")[0]
+
+    else:
+        res["all"] = run_shell0("echo " + res["rpm"] + res["flows"] + " | sort|sha1sum").split(" ")[0]
 
     return json.dumps(res, sort_keys=True, indent=4), 200
