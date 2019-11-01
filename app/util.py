@@ -2,6 +2,7 @@
 import subprocess as sp
 from jinja2 import Template
 from yaml import load
+import os
 
 
 def run_shell(cmd):
@@ -13,7 +14,12 @@ def run_shell0(cmd):
 
 
 def make_ha_config(vip, servers):
-    d = open("./conf/haproxy.cfg.sample").read()
+
+    if os.environ.get("IS_NGINX_GW") == "1":
+        d = open("./conf/haproxy-gw.cfg.sample").read()
+    else:
+        d = open("./conf/haproxy.cfg.sample").read()
+
     t = Template(d)
     out = t.render(vip=vip, servers=servers)
     with open("/etc/haproxy/haproxy.cfg", "w+") as f:

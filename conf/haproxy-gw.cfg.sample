@@ -1,0 +1,95 @@
+#---------------------------------------------------------------------
+# Example configuration for a possible web application.  See the
+# full configuration options online.
+#
+#   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt
+#
+#---------------------------------------------------------------------
+
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    # to have these messages end up in /var/log/haproxy.log you will
+    # need to:
+    #
+    # 1) configure syslog to accept network log events.  This is done
+    #    by adding the '-r' option to the SYSLOGD_OPTIONS in
+    #    /etc/sysconfig/syslog
+    #
+    # 2) configure local2 events to go to the /var/log/haproxy.log
+    #   file. A line like the following can be added to
+    #   /etc/sysconfig/syslog
+    #
+    #    local2.*                       /var/log/haproxy.log
+    #
+    log         127.0.0.1 local2
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     500000
+    user        haproxy
+    group       haproxy
+    daemon
+
+    nbproc      2
+    cpu-map     1 0
+    cpu-map     2 1
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+    stats bind-process 1
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 2
+    timeout http-request    10s
+    timeout queue           3m
+    timeout connect         10s
+    timeout client          3m
+    timeout server          3m
+    timeout http-keep-alive 5s
+    timeout check           10s
+    maxconn                 100000
+
+listen stats *:1936
+        stats enable
+        stats refresh 10s
+        stats hide-version
+        stats uri /haproxy?stats
+        stats auth admin:admin123
+
+# listen ui *:8084
+#        server node0 *:8082
+
+
+listen drop {{vip}}:8083
+        mode tcp
+        balance roundrobin
+
+        # log global
+        # retries 3
+        # option redispatch
+        # option tcplog
+        # option clitcpka
+        # option tcpka
+
+        timeout queue           3m
+        timeout connect         10s
+        timeout client          3m
+        timeout server          3m
+
+        {% for n in servers %}
+        server {{n.id}} {{n.name}}:8090 check port 8090 check port 8081 maxconn 100000
+        {% endfor %}
+
