@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 useradd drop-core
 chown -R drop-core:drop-core /opt/drop-gateway-api
