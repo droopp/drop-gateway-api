@@ -8,6 +8,8 @@ Type=simple
 User=drop-core
 Group=drop-core
 
+EnvironmentFile=/etc/drop-env
+
 WorkingDirectory=/opt/drop-gateway-api
 ExecStart=/opt/drop-gateway-api/start
 ExecStop=

@@ -6,5 +6,10 @@ chown -R drop-core:drop-core /opt/drop-gateway-api
 cp /opt/drop-gateway-api/conf/drop-gateway-api.service /etc/systemd/system/ && systemctl daemon-reload
 systemctl enable drop-gateway-api
 
+if [ ! -f /etc/drop-env ]; then
+    echo "" > /etc/drop-env
+    chown drop-core:drop-core /etc/drop-env
+fi
+
 ## start service
 # systemctl restart drop-gateway-api
