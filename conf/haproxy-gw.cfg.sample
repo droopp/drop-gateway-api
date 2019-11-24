@@ -62,18 +62,21 @@ defaults
     timeout check           10s
     maxconn                 100000
 
-listen stats *:1936
+listen stats 
+        bind *:1936
         stats enable
         stats refresh 10s
         stats hide-version
         stats uri /haproxy?stats
         stats auth admin:admin123
 
-# listen ui *:8084
+# listen ui 
+#        bind *:8084
 #        server node0 *:8082
 
 
-listen drop {{vip}}:8083
+listen drop 
+        bind {{vip}}:8083
         mode tcp
         balance roundrobin
 
